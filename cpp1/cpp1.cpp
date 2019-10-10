@@ -212,9 +212,11 @@ public:
 		fstream file;
 		string word, t, q, filename;
 
-		filename = "C:/Users/psingh/Downloads/lanes.txt";
+		filename = "";
+		cout << "Enter the path of lanes.txt file:\n";
+		cin >> filename;
         file.open(filename.c_str());
-		cout << "Following lanes are available:\n\nLaneID,MaxNumberOfPlayersAllowed\n";
+		cout << "\nFollowing lanes are available:\n\nLaneID, MaxNumberOfPlayersAllowed, PriceOfOneGame\n";
         while (file >> word)
 		{
 			cout << word << endl; 
@@ -353,22 +355,6 @@ public:
 						(*itr).addScore(numPinDown);
 					}
 
-					/*if (i == 0 && standingPins == 0)
-					{
-						printf("There's a strike by player %s\n",(*itr).getName().c_str());
-						(*itr).addScore(20);
-						standingPins = 10;
-					}
-					else if (i == 1 && standingPins == 0)
-					{
-						printf("There's a spare by player %s\n",(*itr).getName().c_str());
-						(*itr).addScore(numPinDown + 5);
-					}
-					else
-					{
-						printf("%s pinned down %d pins in #%d roll.\n", (*itr).getName().c_str(),numPinDown,(i + 1));
-						(*itr).addScore(numPinDown);
-					}*/
 				}
 			}
 			counter++;
