@@ -212,11 +212,14 @@ public:
 		fstream file;
 		string word, t, q, filename;
 
+		Lane lane1(0001,10,100);
+		lanes.push_back(lane1);
 		filename = "";
 		cout << "Enter the path of lanes.txt file:\n";
 		cin >> filename;
         file.open(filename.c_str());
 		cout << "\nFollowing lanes are available:\n\nLaneID, MaxNumberOfPlayersAllowed, PriceOfOneGame\n";
+		cout << "0001,10,100" << endl;
         while (file >> word)
 		{
 			cout << word << endl; 
@@ -480,7 +483,8 @@ int main()
 			Game g1(lane, players, strategies);
 			g1.start();
 			string winnerofgame = g1.getWinner();
-			cout << "***************************************\nWinner of this game is " + winnerofgame + "\n\n\n\n\n\n";
+			cout << "***************************************\nWinner of this game is " + winnerofgame + 
+				"\n#######################################\n\n\n\n\n\n";
 		}
 		else
 			goto hell;
