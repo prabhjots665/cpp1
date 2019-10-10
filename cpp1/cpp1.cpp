@@ -120,164 +120,386 @@
 
 using namespace std;
 
-
-
-bool vis[101];
-
-bool iscyclic(vector<int >adj[], int s, int parent)
+class Player
 {
-	vis[s] = true;
+   public:
+	int id;
+	string name;
+    int totalScore;
 
-	for (auto i = adj[s].begin(); i != adj[s].end(); i++)
+     Player(int id1, string name1)
 	{
-		if (vis[*i] == false) return iscyclic(adj, *i, s);
-		else
-			if (*i != parent) return true;
+		id = id1;
+		name = name1;
+		totalScore = 0;
 	}
 
-	return false;
-}
-
-
-bool isCyclic(vector<int> adj[], int V)
-{
-	
-	for (int i = 0; i < V; i++) 
-		vis[i] = false;
-
-	for (int i = 0; i < V; i++)
+	void addScore(int score)
 	{
-		if (vis[i] == false)
-		{
-			if (iscyclic(adj, i, -1))
-				return true;
-		}
+		totalScore += score;
 	}
 
-	return false;
+	int getID()
+	{
+		return id;
+	}
 
-}
+	string getName()
+	{
+		return name;
+	}
 
-
-//int main()
-//{
-//	int t, tt, n, a, b;
-//	int arr[31];
-//	scanf("%d", &tt);
-//	for (t = 0; t < tt; t++)
-//	{
-//		for (int i = 0; i < 31; ++i)
-//			arr[i] = -1;
-//		scanf("%d", &n);
-//		for (int i = 0; i < n; ++i)
-//		{
-//			scanf("%d %d ", &a, &b);
-//			arr[a] = b;
-//		}
-//
-//		int cc = func(arr);
-//		printf("%d\n", cc);
-//	}
-//	return 0;
-//}
-
-
-
-
-enum Color { WHITE, GRAY, BLACK };
-
-int *color = new int[101];
-
-// Graph class represents a directed graph using 
-// adjacency list representation 
-class Graph
-{
-	int V; // No. of vertices 
-	list<int>* adj; // adjacency lists 
-
-					// DFS traversal of the vertices reachable from v 
-	bool DFSUtil(int v, int color[]);
-public:
-	Graph(int V); // Constructor 
-
-				  // function to add an edge to graph 
-	void addEdge(int v, int w);
-
-	bool isCyclic();
+	int getScore()
+	{
+		return totalScore;
+	}
 };
 
-// Constructor 
-Graph::Graph(int V)
-{
-	this->V = V;
-	adj = new list<int>[V];
-}
 
-// Utility function to add an edge 
-void Graph::addEdge(int v, int w)
+class Lane
 {
-	adj[v].push_back(w); // Add w to v's list. 
-}
+public:
+	int id;
+	int maxPlayers;
+	int numPlayers;
+	int price;
 
-// Recursive function to find if there is back edge 
-// in DFS subtree tree rooted with 'u' 
-bool Graph::DFSUtil(int u, int color[])
-{
-	color[u] = GRAY;
+	Lane() {
+		id = -1;
+		maxPlayers = -1;
+		price = -1;
+	}
 
-	list<int>::iterator i;
-	for (i = adj[u].begin(); i != adj[u].end(); ++i)
+	    Lane(int id1, int maxPlayers1, int price1) {
+		id = id1;
+		maxPlayers = maxPlayers1;
+		price = price1;
+	}
+
+    void setNumPlayers(int numPlayers1)
 	{
-		int v = *i; 
+		numPlayers = numPlayers1;
+	}
 
-		if (color[v] == GRAY)
-			return true;
+	int getID() {
+		return id;
+	}
 
-		if (color[v] == WHITE)
+	int getMaxPlayers() {
+		return maxPlayers;
+	}
+
+	int getNumPlayers() {
+		return numPlayers;
+	}
+
+	int getPrice() {
+		return price;
+	}
+};
+
+
+
+class BowlingAlley
+{
+public:
+	vector<Lane> lanes;	
+	string s;
+    set<int> bookedLanes;
+
+	BowlingAlley() 
+	{
+		fstream file;
+		string word, t, q, filename;
+
+		filename = "C:/Users/psingh/Downloads/lanes.txt";
+        file.open(filename.c_str());
+		cout << "Following lanes are available:\n\nLaneID,MaxNumberOfPlayersAllowed\n";
+        while (file >> word)
 		{
-			if (DFSUtil(v, color) == true)
-				return true;
+			cout << word << endl; 
+			
+			char char_array[101];
+
+			strcpy(char_array, word.c_str());
+
+			char *token = strtok(char_array, ",");
+			int id, numPlayers, price,count=0;
+			while (token != NULL)
+			{
+				if(count==0) id= stoi(token);
+				if(count==1) numPlayers= stoi(token);
+				if(count==2) price= stoi(token);
+				token = strtok(NULL, ",");
+				count++;
+			}
+			Lane lane(id, numPlayers, price);
+			lanes.push_back(lane);
+
+		}
+		
+    }
+
+	Lane getLaneByID(int id) 
+	{
+		bool found = false;
+		int laneID;
+		for (int i=0;i < lanes.size();i++)
+		{
+			if (lanes[i].getID() == id)
+			{
+				laneID=i;
+				found = true;
+			}
+		}
+		if(found) return lanes[laneID];
+	 }
+
+
+	bool bookLane(int laneID)
+	{
+		bool found = false; int i;
+		for (i = 0; i < lanes.size(); i++)
+		{
+			if (lanes[i].getID() == laneID)
+			{
+				found = true;
+				break;
+			}
+		}
+		
+		if (found)
+		{
+			if (bookedLanes.find(laneID) == bookedLanes.end())
+				bookedLanes.insert({laneID});
+			else
+				printf("Lane with id is already booked.");
+		}
+		else
+			printf("Entered lane id is invalid.");
+
+		return found;
+	}
+};
+
+
+struct strategy
+{
+	string strategyName;
+	int chanceNumber;
+	int standingPins;
+	int bonus;
+
+	strategy(string s,int i,int j,int k) 
+	{
+		strategyName = s;
+		chanceNumber = i;
+		standingPins = j;
+		bonus = k;
+	}
+};
+
+
+
+class Game
+{
+public:
+	 Lane lane;
+	 vector<Player> players;
+	 vector<strategy> strategies;
+	 int numSets = 5;
+	 int chancePerSets = 2;
+	 int counter = 0;
+
+    Game(Lane lane1, vector<Player> players1, vector<strategy> strategies1)
+	{
+		lane = lane1;
+		players = players1;
+		strategies = strategies1;
+	}
+
+	void start()
+	{
+		counter = 0;
+		numSets = 10;
+		while (counter < numSets)
+		{
+
+			printf("\nSet number %d of chances:\n", counter + 1);
+			for (auto itr=players.begin();itr!=players.end();itr++) 
+			{
+				int standingPins = 10;
+				int totalPinDown = 0;
+				for (int i = 0; i < chancePerSets && standingPins > 0; i++) 
+				{
+					int numPinDown = takeShot(standingPins);
+					totalPinDown += numPinDown;
+					standingPins -= numPinDown;
+					bool NoStrategyWorked = true;
+					for (auto pi = strategies.begin(); pi != strategies.end(); pi++)
+					{
+						if (i == (*pi).chanceNumber && (*pi).standingPins == standingPins)
+						{
+							printf("There's a %s by player %s\n", (*pi).strategyName.c_str() ,(*itr).getName().c_str());
+							(*itr).addScore(numPinDown + (*pi).bonus);
+							NoStrategyWorked = false;
+							break;
+						}
+					}
+
+					if (NoStrategyWorked)
+					{
+						printf("%s pinned down %d pins in #%d roll.\n", (*itr).getName().c_str(), numPinDown, (i + 1));
+						(*itr).addScore(numPinDown);
+					}
+
+					/*if (i == 0 && standingPins == 0)
+					{
+						printf("There's a strike by player %s\n",(*itr).getName().c_str());
+						(*itr).addScore(20);
+						standingPins = 10;
+					}
+					else if (i == 1 && standingPins == 0)
+					{
+						printf("There's a spare by player %s\n",(*itr).getName().c_str());
+						(*itr).addScore(numPinDown + 5);
+					}
+					else
+					{
+						printf("%s pinned down %d pins in #%d roll.\n", (*itr).getName().c_str(),numPinDown,(i + 1));
+						(*itr).addScore(numPinDown);
+					}*/
+				}
+			}
+			counter++;
 		}
 	}
 
-	color[u] = BLACK;
-    return false;
-}
+	string getWinner()
+	{
+		int maxScore = -1, score;
+		string name;
+		printf("\n\n*****************Score Board*******************\n");
+		for (auto itr=players.begin();itr!=players.end();itr++)
+		{
+			score = (*itr).getScore();
+			printf("Total score of %s is %d.\n",(*itr).getName().c_str(),score);
+			if (score > maxScore)
+			{
+				maxScore = (*itr).getScore();
+				name = (*itr).getName();
+			}
+		}
+		return name;
+	}
 
-// Returns true if there is a cycle in graph 
-bool Graph::isCyclic()
+	int takeShot(int standingPins)
+	{
+		return (rand() % (standingPins + 1));
+	}
+};
+
+
+class BowlingAlleyTesting
 {
-	// Initialize color of all vertices as WHITE
-	for (int i = 0; i < V; i++)
-		color[i] = WHITE;
+public:
+	int counter = 85721;
 
-	// Do a DFS traversal beginning with all 
-	// vertices 
-	for (int i = 0; i < V; i++)
-		if (color[i] == WHITE)
-			if (DFSUtil(i, color) == true)
-				return true;
+	vector<Player> getPlayerDetails()
+	{
+		vector<Player> players;
+		printf("Enter total number of players:\n");
+		int count; scanf("%d", &count);
+		
+		for (int i = 0; i < count; i++)
+		{
+			printf("Enter the player name:");
+			string name; 
+			cin >> name;
+			Player player1(++counter, name);
+			players.push_back(player1);
+		}
 
-	return false;
-}
+		return players;
+	}
 
-// Driver code to test above 
+	vector<strategy> getStrategies()
+	{
+		vector<strategy> strategies;
+        strategy strategy01("strike",0,0,10);
+		strategy strategy02("spare", 1, 0, 5);
+		strategies.push_back(strategy01);
+		strategies.push_back(strategy02);
+		printf("\nStrategies present already are:");
+		printf("\nstrategyName: %s, chanceNumber:%d , standingPins:%d , bonus:%d ",
+			strategy01.strategyName.c_str(), strategy01.chanceNumber, strategy01.standingPins, strategy01.bonus);
+		printf("\nstrategyName: %s, chanceNumber:%d , standingPins:%d , bonus:%d ",
+			strategy02.strategyName.c_str(), strategy02.chanceNumber, strategy02.standingPins, strategy02.bonus);
+
+
+		printf("\n\nEnter number of new strategies you want to add:\n");
+		int count; scanf("%d", &count);
+
+		for (int i = 2; i < count+2; i++)
+		{
+			string name; int chanceNumber, standingPins, bonus; 
+			printf("Enter the strategy name:");
+			cin >> name; 
+			printf("Enter the chanceNumber:"); 
+			cin >> chanceNumber;
+			printf("Enter the standingPins remaining in above chanceNumber:"); 
+			cin >> standingPins;
+			printf("Enter the bonus points awarded in this strategy:"); 
+			cin >> bonus;
+			strategy strategy1(name, chanceNumber , standingPins , bonus);
+			strategies.push_back(strategy1);
+		}
+
+		return strategies;
+	}
+
+	
+};
+
+
+
 int main()
 {
-	// Create a graph given in the above diagram 
-	Graph g(4);
-	g.addEdge(0, 1);
-	g.addEdge(0, 2);
-	g.addEdge(1, 2);
-	//g.addEdge(2, 0);
-	//g.addEdge(2, 3);
-	g.addEdge(3, 3);
+	BowlingAlley alley;
+	Lane lane;
+	bool success = false; int start = 0;
+    BowlingAlleyTesting BowlingAlleyTesting1;
 
-	if (g.isCyclic())
-		cout << "Graph contains cycle";
-	else
-		cout << "Graph doesn't contain cycle";
-	scanf("%d");
+	vector<strategy> strategies = BowlingAlleyTesting1.getStrategies();
 
-	return 0;
+	while (1)
+	{
+		printf("Start a new game? (Press 1 to start and 0 to quit:)\n"); 
+		cin >> start;
+		if (start == 1)
+		{
+			while (!success)
+			{
+				printf("\nChoose the lane you want to play in by entering the id:\n");
+				int laneid;
+				scanf("%d", &laneid);
+				lane = alley.getLaneByID(laneid);
+				success = alley.bookLane(laneid);
+			}
+
+
+			printf("\nEnter player details:\n");
+			vector<Player> players = BowlingAlleyTesting1.getPlayerDetails();
+
+			Game g1(lane, players, strategies);
+			g1.start();
+			string winnerofgame = g1.getWinner();
+			cout << "***************************************\nWinner of this game is " + winnerofgame + "\n\n\n\n\n\n";
+		}
+		else
+			goto hell;
+		
+	}
+
+    hell:;
 }
